@@ -1,13 +1,12 @@
 #include "M5Unified.h"
 #include "QRCode_esp32_compat.h"
 
-#define QRCODE_VERSION 2
+#define QRCODE_VERSION 3
 #define screen_width 128
 #define screen_height 128
 
-#define CONTENT "BANANA"
-// #define CONTENT "otpauth://totp/test?secret=I65VU7K5ZQL7WB4E"
 // this is a test key
+char content[52] = "otpauth://totp/A?secret=I65VU7K5ZQL7WB4E";
 
 void setup()
 {
@@ -18,13 +17,13 @@ void setup()
 
     // Setup display
     M5.Display.init();
-    M5.Display.setBrightness(20);
+    M5.Display.setBrightness(10);
     M5.Display.fillScreen(TFT_WHITE);
 
     // Create the QR code
     QRCode qrcode;
     uint8_t qrcodeData[qrcode_getBufferSize(QRCODE_VERSION)];
-    qrcode_initText(&qrcode, qrcodeData, QRCODE_VERSION, ECC_LOW, CONTENT);
+    qrcode_initText(&qrcode, qrcodeData, QRCODE_VERSION, ECC_LOW, content);
 
     auto scale = screen_width / qrcode.size;
     auto padding = (screen_width - (qrcode.size * scale)) / 2;
@@ -37,7 +36,6 @@ void setup()
             if (qrcode_getModule(&qrcode, x, y))
             {
                 M5.Display.fillRect(padding + x * scale, padding + y * scale, scale, scale, TFT_BLACK);
-                // M5.Display.pixel(padding + x * scale, padding + y * scale, TFT_RED);
             }
         }
         Serial.print("\n");
